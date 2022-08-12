@@ -27,13 +27,15 @@ int displayReverse(Node *head);
 int countLength(Node *&head);
 void insertionAtSpecificPosition(Node *&head, int pos, int val);
 int searchByValueUnique(Node *&head, int key);
-void searchByValueDulicate(Node *&head, int key);
-Test searchByValueDulicateReturn(Node *&head, int key);
+void searchByValueDuplicate(Node *&head, int key);
+Test searchByValueDuplicateReturn(Node *&head, int key);
 void searchByValueUnique(Node *&head, int searchValue, int value);
 void deletionAtHead(Node *&head);
 void deletionAtTail(Node *&head);
 void deletionAtSpecificPosition(Node *&head, int position);
 void deletionByValueUnique(Node *&head, int value);
+void insertionByValueDuplicate(Node *&head, int searchValue, int value);
+void deletionByValueDuplicate(Node *&head, int value);
 
 // Function implementation
 void insertAtTail(Node *&head, int val)
@@ -136,7 +138,7 @@ void insertionAtSpecificPosition(Node *&head, int pos, int val)
     temp->Next = newNode;
 }
 
-void searchByValueDulicate(Node *&head, int key)
+void searchByValueDuplicate(Node *&head, int key)
 {
     Node *temp = head;
     int size;
@@ -172,7 +174,7 @@ void searchByValueDulicate(Node *&head, int key)
     cout << endl;
 }
 
-Test searchByValueDulicateReturn(Node *&head, int key)
+Test searchByValueDuplicateReturn(Node *&head, int key)
 {
     Node *temp = head;
     Test T;
@@ -204,6 +206,20 @@ void insertionByValueUnique(Node *&head, int searchValue, int value)
 
     // Step 2: Insert the value at the position+1
     insertionAtSpecificPosition(head, position + 1, value);
+}
+
+void insertionByValueDuplicate(Node *&head, int searchValue, int value)
+{
+    // Step 1: Search the position of the searchValue
+    Test position = searchByValueDuplicateReturn(head, searchValue);
+
+    int i = 1;
+    // Step 2: Insert the value at the position+1
+    while (i < position.position[0])
+    {
+        insertionAtSpecificPosition(head, position.position[i] + i, value);
+        i++;
+    }
 }
 
 void deletionAtHead(Node *&head)
@@ -298,6 +314,64 @@ void deletionByValueUnique(Node *&head, int value)
     }
 }
 
+void deletionByValueDuplicate(Node *&head, int value)
+{
+    // Step 1: Search the position of the Value
+    Test position = searchByValueDuplicateReturn(head, value);
+
+    int i = 1;
+    if (position.position[0] == 1)
+    {
+        cout << "Value not found." << endl;
+    }
+    else
+    {
+        // Step 2: Delete the values
+        while (i < position.position[0])
+        {
+            deletionAtSpecificPosition(head, position.position[i] - i + 1);
+            i++;
+        }
+    }
+}
+
+Node *reverseNonRecursive(Node *&head)
+{
+    Node *prev = NULL;
+    Node *current = head;
+    if (head == NULL)
+    {
+        cout << "The linked list is empty" << endl;
+        return head;
+    }
+    Node *next = head->Next;
+
+    while (true)
+    {
+        current->Next = prev;
+        prev = current;
+        current = next;
+        if (current == NULL)
+            break;
+
+        next = next->Next;
+    }
+    return prev;
+}
+
+Node *reverseRecursive(Node *&head)
+{
+    if (head->Next == NULL || head == NULL)
+    {
+        return head;
+    }
+    Node *newHead = reverseRecursive(head->Next);
+    head->Next->Next = head;
+    head->Next = NULL;
+
+    return newHead;
+}
+
 int main()
 {
     Node *head = NULL;
@@ -310,11 +384,14 @@ int main()
          << "Choice 4: Search a value(Uniqe List)" << endl
          << "Choice 5: Search a value(Duplicate enabled List)" << endl
          << "Choice 6: Insertion after a specific value." << endl
-         // << "Choice 7: Insetion after a specifiic value in a duplicate list"
          << "Choice 7: Deletion at Head" << endl
          << "Choice 8: Deletion at Tail" << endl
          << "Choice 9: Deletion at specific position" << endl
-         << "Choice 10: Deletion by Value Unique List)" << endl
+         << "Choice 10: Deletion by Value (Unique List)" << endl
+         << "Choice 11: Insetion after a specifiic value in a duplicate list" << endl
+         << "Choice 12: Delete by Value (Duplicate List)" << endl
+         << "Choice 13: Reverse non recursive." << endl
+         << "Choice 14: Reverse Recursive." << endl
          << "Choice 0: Exit" << endl
          << endl;
     int choice;
@@ -325,6 +402,8 @@ int main()
 
         int position;
         int value;
+        int searchValue;
+        int delValue;
         switch (choice)
         {
         case 1:
@@ -362,7 +441,7 @@ int main()
             cin >> value;
             // cout<< "The number at Position :";
             Test T;
-            T = searchByValueDulicateReturn(head, value);
+            T = searchByValueDuplicateReturn(head, value);
             if (T.position[0] == 1)
             {
                 cout << "The search value is not yet in the list.";
@@ -382,7 +461,6 @@ int main()
             break;
         case 6:
             cout << "Enter the value to search: ";
-            int searchValue;
             cin >> searchValue;
             cout << "Enter the value to insert: ";
             cin >> value;
@@ -406,16 +484,27 @@ int main()
             break;
         case 10:
             cout << "Enter the value to Delete: ";
-            int delValue;
+
             cin >> delValue;
             deletionByValueUnique(head, delValue);
-            // if (head == NULL)
-            // {
-            //     cout << "There is No Value in the Linked List" << endl;
-            //     break;
-            // }
-
             break;
+        case 11:
+            cout << "Enter the value to search: ";
+            cin >> searchValue;
+            cout << "Enter the value to insert: ";
+            cin >> value;
+            insertionByValueDuplicate(head, searchValue, value);
+            break;
+        case 12:
+            cout << "Enter the value to Delete: ";
+            cin >> delValue;
+            deletionByValueDuplicate(head, delValue);
+            break;
+        case 13:
+            head = reverseNonRecursive(head);
+            break;
+        case 14:
+            head = reverseRecursive(head);
         default:
             break;
         }
